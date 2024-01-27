@@ -73,8 +73,6 @@ export class SessionService {
       this.session.accessTokenExpiresAt = null;
       this.session.accessTokenTtl = null;
     }
-
-    console.log("Session remove Access");
   }
 
   static removeRefreshToken(): void {
@@ -82,8 +80,6 @@ export class SessionService {
     if (this.session) {
       this.session.refreshToken = null;
     }
-
-    console.log("Session remove Refresh");
   }
 
   static clear(): void {
