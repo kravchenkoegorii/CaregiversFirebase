@@ -1,0 +1,53 @@
+name: Build and Test React
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+
+  pull_request:
+    branches:
+      - develop
+
+  workflow_dispatch:
+
+env:
+  Cache: 'npm'
+  CacheDependencyPath: 'package-lock.json'
+
+jobs:
+  build-and-test-react:
+    name: Build and Test React
+    runs-on: ${{ matrix.environment }}
+    strategy:
+      matrix:
+        node-version: [ 18.x ]
+        environment:
+          - ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "${{ env.Cache }}"
+          cache-dependency-path: "${{ env.CacheDependencyPath }}"
+
+      - name: Print current node version
+        run: node -v
+
+      - name: Print current npm version
+        run: npm -v
+
+      - name: Restore Npm Packages
+        run: npm ci
+
+      - name: React build
+        run: CI=false npm run build --if-present
+
+#     - name: React test
+#       run: npm run test --if-present

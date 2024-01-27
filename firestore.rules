@@ -1,0 +1,48 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+  function isLoggedIn(){
+  return request.auth != null;
+  }
+  
+  function isAuthor() {
+  return resource.data.createdBy == request.auth.uid;
+  }
+
+  function hasAnyRole(roles) {
+  return isLoggedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in roles;
+  }
+    match /users/{userId} {
+    allow read: if isLoggedIn();
+    allow write: if hasAnyRole(['Admin']);
+    }
+
+    match /tests/{testId} {
+    allow read: if hasAnyRole(['Elderly']);
+    }
+
+    match /requests/{requestId} {
+
+    function isAssigned() {
+    return resource.data.caregiverId == request.auth.uid;
+    }
+
+    function isNotAssigned() {
+    return resource.data.status == 'CREATED' && resource.data.caregiverId == '';
+    }
+
+    function isActual() {
+    return resource.data.date > request.time;
+    }
+
+    allow list, get: if
+    (hasAnyRole(['Elderly']) && (isAuthor()) ||
+    (hasAnyRole(['Caregiver']) && (isNotAssigned() || isAssigned())));
+
+    allow create: if hasAnyRole(['Elderly']);
+    allow update: if hasAnyRole(['Caregiver']) && isActual() && isNotAssigned();
+    }
+  }
+}
