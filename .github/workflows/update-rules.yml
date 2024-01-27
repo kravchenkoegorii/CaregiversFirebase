@@ -2,8 +2,6 @@ name: Update Firebase Rules
 
 on:
   push:
-    branches:
-#      - develop
 
 jobs:
   update_firebase_rules:
