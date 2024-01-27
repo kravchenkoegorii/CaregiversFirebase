@@ -2,8 +2,6 @@ name: Heroku Deploy
 
 on:
   push:
-    branches:
-      - master
 
   workflow_dispatch:
 
