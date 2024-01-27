@@ -42,7 +42,7 @@ jobs:
         run: npm ci
 
       - name: Node build
-        run: CI=false npm run build --if-present
+        run: CI=false npm run build --if-present --production
 
   heroku-deploy:
     needs: [ build-and-test-node ]
